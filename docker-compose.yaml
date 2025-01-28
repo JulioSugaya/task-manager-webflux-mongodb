@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+#  task-manager:
+#    container_name: task-api
+#    build:
+#      context: ./
+#      dockerfile: Dockerfile
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - mongodb
+#    networks:
+#      - task-manager-network
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: task-manager-db
+#      MONGO_INITDB_ROOT_USERNAME: root
+#      MONGO_INITDB_ROOT_PASSWORD: admin
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb:/data/db
+
+volumes:
+  mongodb:
+    driver: local
+
+#    networks:
+#      - task-manager-network
+#
+#networks:
+#  task-manager-network:
+##    external: false
