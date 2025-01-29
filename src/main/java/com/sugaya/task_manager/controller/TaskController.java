@@ -2,8 +2,9 @@ package com.sugaya.task_manager.controller;
 
 import com.sugaya.task_manager.dto.TaskDTO;
 import com.sugaya.task_manager.service.TaskService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -19,31 +20,35 @@ public class TaskController {
     private TaskMapper taskMapper;
 
     @GetMapping("/{id}")
-    public Mono<TaskDTO> getTaskById(@PathVariable String id) {
-        return taskService.findById(id).map(taskMapper::toDTO);
+    public Mono<ResponseEntity<TaskDTO>> getTaskById(@PathVariable String id) {
+        return taskService.findById(id)
+                .map(task -> new ResponseEntity<>(taskMapper.toDTO(task), HttpStatus.OK))
+                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @Tag(name = "get", description = "GET All tasks")
     @GetMapping("/")
     public Flux<TaskDTO> getAllTask() {
         return taskService.getAll().map(taskMapper::toDTO);
     }
 
     @PostMapping("/")
-    public Mono<TaskDTO> createTask(@RequestBody TaskDTO dto) {
+    public Mono<ResponseEntity<TaskDTO>> createTask(@RequestBody TaskDTO dto) {
         return taskService.createTask(taskMapper.toEntity(dto))
-                .map(taskMapper::toDTO);
+                .map(task -> new ResponseEntity<>(taskMapper.toDTO(task), HttpStatus.OK));
     }
 
     @PutMapping("/")
-    public Mono<TaskDTO> updateTask(@RequestBody TaskDTO dto) {
+    public Mono<ResponseEntity<TaskDTO>> updateTask(@RequestBody TaskDTO dto) {
         return taskService.updateTask(taskMapper.toEntity(dto))
-                .map(taskMapper::toDTO);
+                .map(task -> new ResponseEntity<>(taskMapper.toDTO(task), HttpStatus.OK))
+                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteTask(@PathVariable String id) {
-        taskService.deleteTask(id);
+    public Mono<ResponseEntity<Void>> deleteTask(@PathVariable String id) {
+        return taskService.deleteTask(id)
+                .then(Mono.just(new ResponseEntity<Void>(HttpStatus.OK)))
+                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
 }

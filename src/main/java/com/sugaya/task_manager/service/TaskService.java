@@ -13,10 +13,6 @@ public class TaskService {
     @Autowired
     private TaskRepository taskRepository;
 
-//    public TaskService(TaskRepository taskRepository) {
-//        this.taskRepository = taskRepository;
-//    }
-
     public Mono<Task> findById(String id) {
         return taskRepository.findById(id)
                 .switchIfEmpty(Mono.error(new Exception()));
@@ -30,8 +26,8 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    public void deleteTask(String id) {
-        taskRepository.deleteById(id);
+    public Mono<Void> deleteTask(String id) {
+        return findById(id).flatMap( task -> taskRepository.delete(task));
     }
 
     public Mono<Task> updateTask(Task task) {
