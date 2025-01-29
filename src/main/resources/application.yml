@@ -6,7 +6,7 @@ spring:
 #      on-profile: default
   data:
     mongodb:
-      host: localhost #mongodb
+      host: mongodb
       port: 27017
       database: ${MONGO_INITDB_ROOT_PASSWORD:task-manager-db}
 #      username: root

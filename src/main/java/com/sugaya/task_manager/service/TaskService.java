@@ -1,6 +1,7 @@
 package com.sugaya.task_manager.service;
 
 import com.sugaya.task_manager.entity.Task;
+import com.sugaya.task_manager.exception.ResourceNotFoundException;
 import com.sugaya.task_manager.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,7 @@ public class TaskService {
 
     public Mono<Task> findById(String id) {
         return taskRepository.findById(id)
-                .switchIfEmpty(Mono.error(new Exception()));
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Task Id: " + id + " not found.")));
     }
 
     public Flux<Task> getAll() {
